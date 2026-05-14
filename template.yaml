@@ -47,14 +47,14 @@ Resources:
             QueryString: false
         ViewerCertificate:
           CloudFrontDefaultCertificate: true
-    
+
   BucketPolicy:
     Type: AWS::S3::BucketPolicy
     Properties:
       Bucket: !Ref FrontendBucket
       PolicyDocument:
-         Version: "2012-10-17"
-         Statement:
+        Version: "2012-10-17"
+        Statement:
           - Sid: AllowCloudFrontAccess
             Effect: Allow
             Principal:
@@ -64,8 +64,7 @@ Resources:
             Condition:
               StringEquals:
                 AWS:SourceArn: !Sub "arn:aws:cloudfront::${AWS::AccountId}:distribution/${FrontendDistribution}"
-    
-   
+
   
 Outputs:
   FrontendURL:
