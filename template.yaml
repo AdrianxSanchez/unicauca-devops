@@ -28,27 +28,6 @@ Resources:
         SigningProtocol: sigv4
     Metadata:
       SamResourceId: FrontendOAC
-  BucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket:
-        Ref: FrontendBucket
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-        - Sid: AllowCloudFrontAccess
-          Effect: Allow
-          Principal:
-            Service: cloudfront.amazonaws.com
-          Action: s3:GetObject
-          Resource:
-            Fn::Sub: ${FrontendBucket.Arn}/*
-          Condition:
-            StringEquals:
-              AWS:SourceArn:
-                Fn::Sub: arn:aws:cloudfront::${AWS::AccountId}:distribution/${FrontendDistribution}
-    Metadata:
-      SamResourceId: BucketPolicy
   FrontendDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
@@ -79,14 +58,35 @@ Resources:
           CloudFrontDefaultCertificate: true
     Metadata:
       SamResourceId: FrontendDistribution
-
+  BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: FrontendBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Sid: AllowCloudFrontAccess
+          Effect: Allow
+          Principal:
+            Service: cloudfront.amazonaws.com
+          Action: s3:GetObject
+          Resource:
+            Fn::Sub: ${FrontendBucket.Arn}/*
+          Condition:
+            StringEquals:
+              AWS:SourceArn:
+                Fn::Sub: arn:aws:cloudfront::${AWS::AccountId}:distribution/${FrontendDistribution}
+    Metadata:
+      SamResourceId: BucketPolicy
   UploadFunction:
     Type: AWS::Serverless::Function
     Properties:
-      FunctionName: "UploadFileFunction-${AWS::StackName}"
+      FunctionName:
+        Fn::Sub: UploadFileFunction-${AWS::StackName}
       Handler: app.lambda_handler
       Runtime: python3.10
-      CodeUri: BACK/
+      CodeUri: s3://aws-sam-cli-managed-default-samclisourcebucket-dkky7cf6m1zc/d0a888d68870255be9cb9ec2c4d82737
       MemorySize: 128
       Timeout: 5
       Events:
@@ -95,6 +95,8 @@ Resources:
           Properties:
             Path: /upload
             Method: post
+    Metadata:
+      SamResourceId: UploadFunction
 Outputs:
   FrontendURL:
     Description: "URL p\xFAblica del frontend"
