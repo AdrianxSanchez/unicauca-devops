@@ -35,6 +35,7 @@ jobs:
     - name: SAM Deploy
       run: |
         sam deploy \
+          --resolve-s3
           --stack-name ${STACK_NAME} \
           --region ${AWS_REGION} \
           --capabilities CAPABILITY_IAM \
@@ -44,3 +45,8 @@ jobs:
     - name: Upload frontend to S3
       run: |
           aws s3 sync FRONT/ s3://$BUCKET_NAME --delete
+
+    - name: Install Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.10"
